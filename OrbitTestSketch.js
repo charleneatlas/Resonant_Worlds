@@ -1,13 +1,15 @@
 let points;
+var backgroundImg;
 
 function preload() {
   points = loadJSON("orbits.json");
+  backgroundImg = loadImage('plot_bg_animation_slim.png');
 }
 
 function setup() {
-  let canvas = createCanvas(400, 400);
+  let canvas = createCanvas(720, 400);
   canvas.parent("sketch-container");
-  background(255);
+  
   noLoop(); //don't need to loop in this test because just rendering the orbit paths, not the planets.
   //frameRate(30);
 
@@ -15,7 +17,7 @@ function setup() {
 }
 
 function draw() {
-  background(0);
+  background(backgroundImg);
   fill(0, 100, 200);
   noStroke();
 
