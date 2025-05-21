@@ -15,23 +15,24 @@ function setup() {
 }
 
 function draw() {
-  background(255);
+  background(0);
   fill(0, 100, 200);
   noStroke();
 
   // Highest level JSON grouping is each planet name, which then has a dictionary of XY tuples.
 
-  testPoints = points[planets[0]];
-
-    for (const [x,y] of testPoints)
+    for(let i = 0; i < planets.length; i++)
+    {
+        for (const [x,y] of points[planets[i]])
     {
 
         ellipse(
         map(x, -62, 62, 0, width),
         map(y, -62/(9/5), 62/(9/5), 0, height),
-        10,
-        10
+        2,
+        2
         );
+    }
     }
 
 }
