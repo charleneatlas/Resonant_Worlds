@@ -7,7 +7,7 @@ var backgroundImg;
 let planetPositions; // loaded position data from JSON
 let frameIndex = 0;
 let frames = [];
-let frameDelay = 15; // frames to wait before advancing
+let frameDelay = 0; // frames to wait before advancing
 let timer = 0;
 
 // Grab the data and images
@@ -22,7 +22,7 @@ function setup() {
   canvas.parent("sketch-container");
 
   //noLoop(); //don't need to loop in this test because just rendering the orbit paths, not the planets.
-  //frameRate(30);
+  frameRate(24);
 
   planets = Object.keys(orbitPathPoints); // Get the keys of all the frames in JSON
   frames = planetPositions["frames"];
@@ -61,8 +61,8 @@ function drawOrbits() {
 function drawPlanets() {
   // for each frame, get keys (which will be planet names), for each one there is an array of tuples
 
-  for (const planet in frames[0]) {
-    for (const [x, y] of frames[0][planet]) {
+  for (const planet in frames[frameIndex]) {
+    for (const [x, y] of frames[frameIndex][planet]) {
       ellipse(
         map(x, -62, 62, 0, width),
         map(y, -62 / (9 / 5), 62 / (9 / 5), 0, height),
@@ -71,6 +71,10 @@ function drawPlanets() {
       );
 
       //print("X:" + x + " Y:" + y);
+      //print(frameIndex);
     }
   }
+
+  frameIndex = (frameIndex + 1) % frames.length;
+  //print(frameIndex);
 }
