@@ -5,7 +5,7 @@ let frameDelay = 15; // frames to wait before advancing
 let timer = 0;
 
 function preload() {
-  positions = loadJSON("frametest.json");
+  planetPositions = loadJSON("frametest.json");
 }
 
 function setup() {
@@ -15,7 +15,7 @@ function setup() {
   //noLoop();
   frameRate(30);
 
-  frameKeys = Object.keys(positions.frames); // Get the keys of all the frames in JSON
+  frameKeys = Object.keys(planetPositions.frames); // Get the keys of all the frames in JSON
 }
 
 function draw() {
@@ -24,7 +24,7 @@ function draw() {
   noStroke();
 
   // Highest level JSON grouping is frames, which is an array of planets.
-  let currentFrame = positions.frames[frameKeys[frameIndex]];
+  let currentFrame = planetPositions.frames[frameKeys[frameIndex]];
 
   for (let [planetID, pos] of Object.entries(currentFrame)) {
     // Each planet is a key value pair of planet id and xy postition.
