@@ -1,6 +1,8 @@
 // For orbit paths
 let orbitPathPoints;
-//let planetOrbits;
+//var planets;
+
+let staticLayer;
 var backgroundImg;
 
 // For planet positions
@@ -14,41 +16,56 @@ let timer = 0;
 function preload() {
   orbitPathPoints = loadJSON("orbits.json");
   planetPositions = loadJSON("planetFrames.json");
-  backgroundImg = loadImage("plot_bg_animation_slim.png");
+  backgroundImg = loadImage("plot_bg_animation_slim_Small.png");
 }
 
 function setup() {
   let canvas = createCanvas(720, 400);
   canvas.parent("sketch-container");
 
-  //noLoop(); //don't need to loop in this test because just rendering the orbit paths, not the planets.
-  frameRate(24);
+  fill(0, 100, 200);
+  // Set up static layer for orbits
+  staticLayer = createGraphics(720, 400);
+  staticLayer.clear();
+  staticLayer.fill(0, 100, 200);
+  staticLayer.noStroke();
+  drawOrbits();
 
-  planets = Object.keys(orbitPathPoints); // Get the keys of all the frames in JSON
+  // Set up animated layer for planets
+  animationLayer = createGraphics(720, 400);
+
+  //noLoop();
+  frameRate(90);
   frames = planetPositions["frames"];
 }
 
 function draw() {
-  background(backgroundImg);
-  fill(0, 100, 200);
-  noStroke();
+  // Draw static background image
+  image(backgroundImg, 0, 0);
+  //background(backgroundImg);
+  // Draw static layer for orbits
 
-  drawOrbits();
-
-  push();
-
-  fill(0, 255, 0);
+  image(staticLayer, 0, 0);
+  //Clear and Draw animated layer
+  animationLayer.clear();
+  //animationLayer.background(0, 0, 0, 0); // Transparent clear (RGBA)
+  animationLayer.noStroke();
+  animationLayer.fill(0, 255, 0);
+  animationLayer.noSmooth(); // Turns off anti-aliasing to improve performance
   drawPlanets();
+  image(animationLayer, 0, 0);
 
-  pop();
+  text(nf(frameRate(), 2, 1), 10, 20);
 }
 
 function drawOrbits() {
   // Highest level JSON grouping is each planet name, which then has a dictionary of XY tuples.
 
+  planets = Object.keys(orbitPathPoints); // Get the keys of all the frames in JSON
+
   for (let i = 0; i < planets.length; i++) {
     for (const [x, y] of orbitPathPoints[planets[i]]) {
-      ellipse(
+      staticLayer.ellipse(
         map(x, -62, 62, 0, width),
         map(y, -62 / (9 / 5), 62 / (9 / 5), 0, height),
         2,
@@ -63,7 +80,7 @@ function drawPlanets() {
 
   for (const planet in frames[frameIndex]) {
     for (const [x, y] of frames[frameIndex][planet]) {
-      ellipse(
+      animationLayer.ellipse(
         map(x, -62, 62, 0, width),
         map(y, -62 / (9 / 5), 62 / (9 / 5), 0, height),
         8,
