@@ -42,19 +42,19 @@ function setup() {
 function draw() {
   // Draw static background image
   image(backgroundImg, 0, 0);
-  //background(backgroundImg);
-  // Draw static layer for orbits
 
+  // Draw static layer for orbits
   image(staticLayer, 0, 0);
+
   //Clear and Draw animated layer
   animationLayer.clear();
-  //animationLayer.background(0, 0, 0, 0); // Transparent clear (RGBA)
   animationLayer.noStroke();
   animationLayer.fill(0, 255, 0);
   animationLayer.noSmooth(); // Turns off anti-aliasing to improve performance
   drawPlanets();
   image(animationLayer, 0, 0);
 
+  //FPS counter display
   text(nf(frameRate(), 2, 1), 10, 20);
 }
 
