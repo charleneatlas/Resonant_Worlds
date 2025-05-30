@@ -63,15 +63,17 @@ function drawOrbits() {
 
   planets = Object.keys(orbitPathPoints); // Get the keys of all the frames in JSON
 
-  for (let i = 0; i < planets.length; i++) {
-    for (const [x, y] of orbitPathPoints[planets[i]]) {
-      staticLayer.ellipse(
-        map(x, -62, 62, 0, width),
-        map(y, -62 / (9 / 5), 62 / (9 / 5), 0, height),
-        2,
-        2
-      );
-    }
+  let allPoints = planets.flatMap((p) => orbitPathPoints[p]);
+
+  for (let i = 0; i < allPoints.length; i++) {
+    let [x, y] = allPoints[i];
+
+    staticLayer.ellipse(
+      map(x, -62, 62, 0, width),
+      map(y, -62 / (9 / 5), 62 / (9 / 5), 0, height),
+      2,
+      2
+    );
   }
 }
 
