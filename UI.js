@@ -26,6 +26,7 @@ const sketch = (p) => {
   };
   let points = [];
   let hoveredLine = null;
+  let hoveredPlanets = ""; //will be a concatenated string of the two planet names, e.g. "be"
 
   p.setup = () => {
     p.createCanvas(720, 400);
@@ -38,7 +39,6 @@ const sketch = (p) => {
       let y = radius * p.sin(angle) + p.height / 2;
       points.push(p.createVector(x, y));
     }
-    p.textFont("Arial", 20);
   };
 
   p.draw = () => {
@@ -90,7 +90,8 @@ const sketch = (p) => {
     for (let i = 0; i < n; i++) {
       const pt = points[i];
       p.circle(pt.x, pt.y, pointRadius * 2);
-      p.text(labels[i], pt.x, pt.y - 15);
+      p.textFont("Arial", 30);
+      p.text(labels[i], pt.x - 15, pt.y - 15);
     }
 
     // Draw tooltip if hovering a line
@@ -115,7 +116,25 @@ const sketch = (p) => {
       // Draw tooltip text
       p.fill(0);
       p.noStroke();
+      p.textFont("Arial", 20);
       p.text(tooltipText, midX, midY - 20);
+
+      // Update shared data with main sketch to indicate selected planets
+      if (hoveredPlanets != label1 + label2) {
+        // Check if a hover has just started
+        hoveredPlanets = label1 + label2;
+        window.sharedData.selectedPlanets = hoveredPlanets.split("");
+        window.sharedData.updateOrbits = true;
+        console.log("hover start");
+      }
+    } else {
+      if (
+        !window.sharedData.updateOrbits &&
+        window.sharedData.selectedPlanets != window.sharedData.allPlanets
+      ) {
+        window.sharedData.selectedPlanets = window.sharedData.allPlanets;
+        window.sharedData.updateOrbits = true;
+      }
     }
   };
 

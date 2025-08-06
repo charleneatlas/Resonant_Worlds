@@ -30,7 +30,8 @@ const mainSketch = (p) => {
     staticLayer.clear();
     staticLayer.fill(0, 100, 200);
     staticLayer.noStroke();
-    drawOrbits();
+    planets = Object.keys(orbitPathPoints); // Get the keys of all the frames in JSON, which are the planet names (e.g. "b", "c")
+    drawOrbits(planets);
 
     // Set up animated layer for planets
     animationLayer = p.createGraphics(720, 400);
@@ -44,7 +45,12 @@ const mainSketch = (p) => {
     // Draw static background image
     p.image(backgroundImg, 0, 0);
 
-    // Draw static layer for orbits
+    // Draw static layer for orbits, and only update drawing the orbit points if new set of planets selected
+    if (window.sharedData.updateOrbits) {
+      staticLayer.clear();
+      drawOrbits(window.sharedData.selectedPlanets);
+      window.sharedData.updateOrbits = false;
+    }
     p.image(staticLayer, 0, 0);
 
     //Clear and Draw animated layer
@@ -59,12 +65,10 @@ const mainSketch = (p) => {
     p.text(p.nf(p.frameRate(), 2, 1), 10, 20);
   };
 
-  function drawOrbits() {
+  function drawOrbits(planets) {
     // Highest level JSON grouping is each planet name, which then has a dictionary of XY tuples.
 
-    planets = Object.keys(orbitPathPoints); // Get the keys of all the frames in JSON
-
-    let allPoints = planets.flatMap((p) => orbitPathPoints[p]);
+    let allPoints = planets.flatMap((pl) => orbitPathPoints[pl]);
 
     for (let i = 0; i < allPoints.length; i++) {
       let [x, y] = allPoints[i];
@@ -83,12 +87,14 @@ const mainSketch = (p) => {
 
     for (const planet in frames[frameIndex]) {
       for (const [x, y] of frames[frameIndex][planet]) {
-        animationLayer.ellipse(
-          p.map(x, -62, 62, 0, p.width),
-          p.map(y, -62 / (9 / 5), 62 / (9 / 5), 0, p.height),
-          8,
-          8
-        );
+        if (window.sharedData.selectedPlanets.includes(planet)) {
+          animationLayer.ellipse(
+            p.map(x, -62, 62, 0, p.width),
+            p.map(y, -62 / (9 / 5), 62 / (9 / 5), 0, p.height),
+            8,
+            8
+          );
+        }
 
         //print("X:" + x + " Y:" + y);
         //print(frameIndex);
