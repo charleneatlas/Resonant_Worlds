@@ -3,6 +3,7 @@ let orbitPathPoints;
 //var planets;
 
 let staticLayer;
+let staticOrbitLayers = {}; // To improve performance, we will store a graphics layer for each pair combination of orbits and the default option of all orbits.
 var backgroundImg;
 
 // For planet positions
@@ -25,13 +26,9 @@ const mainSketch = (p) => {
     canvas.parent("sketch-container");
 
     p.fill(0, 100, 200);
-    // Set up static layer for orbits
-    staticLayer = p.createGraphics(720, 400);
-    staticLayer.clear();
-    staticLayer.fill(0, 100, 200);
-    staticLayer.noStroke();
-    planets = Object.keys(orbitPathPoints); // Get the keys of all the frames in JSON, which are the planet names (e.g. "b", "c")
-    drawOrbits(planets);
+
+    // Create a static graphic layer for each pair of planets and the option of all planets, that can be chosen to be drawn.
+    createOrbitLayers();
 
     // Set up animated layer for planets
     animationLayer = p.createGraphics(720, 400);
@@ -47,11 +44,19 @@ const mainSketch = (p) => {
 
     // Draw static layer for orbits, and only update drawing the orbit points if new set of planets selected
     if (window.sharedData.updateOrbits) {
-      staticLayer.clear();
-      drawOrbits(window.sharedData.selectedPlanets);
       window.sharedData.updateOrbits = false;
     }
-    p.image(staticLayer, 0, 0);
+    if (Object.keys(staticOrbitLayers).length > 0) {
+      console.log(
+        "Drawing static orbits for: " +
+          window.sharedData.selectedPlanets.join("")
+      );
+      p.image(
+        staticOrbitLayers[window.sharedData.selectedPlanets.join("")], // Get correct layer for selected planet pair
+        0,
+        0
+      );
+    }
 
     //Clear and Draw animated layer
     animationLayer.clear();
@@ -65,21 +70,52 @@ const mainSketch = (p) => {
     p.text(p.nf(p.frameRate(), 2, 1), 10, 20);
   };
 
-  function drawOrbits(planets) {
-    // Highest level JSON grouping is each planet name, which then has a dictionary of XY tuples.
+  function setupStaticOrbitLayer() {
+    let sLayer;
+    sLayer = p.createGraphics(720, 400);
+    sLayer.clear();
+    sLayer.fill(0, 100, 200);
+    sLayer.noStroke();
+    return sLayer;
+  }
 
+  function createOrbitLayers() {
+    let planetPairs = Object.keys(window.sharedData.ratios);
+    //console.log(planetPairs);
+
+    for (const pPair of planetPairs) {
+      // Set up static layer for orbits
+      let sLayer = setupStaticOrbitLayer();
+
+      drawOrbits(pPair.split(""), pPair, sLayer);
+    }
+
+    // Add on one more static layer for when all planets selected
+    let sLayer;
+    sLayer = setupStaticOrbitLayer();
+
+    drawOrbits(
+      Object.keys(orbitPathPoints),
+      Object.keys(orbitPathPoints).join(""),
+      sLayer
+    ); //send all the planets, which are keys of this array
+  }
+
+  function drawOrbits(planets, pPair, sLayer) {
+    // Highest level JSON grouping is each planet name, which then has a dictionary of XY tuples.
     let allPoints = planets.flatMap((pl) => orbitPathPoints[pl]);
 
     for (let i = 0; i < allPoints.length; i++) {
       let [x, y] = allPoints[i];
 
-      staticLayer.ellipse(
+      sLayer.ellipse(
         p.map(x, -62, 62, 0, p.width),
         p.map(y, -62 / (9 / 5), 62 / (9 / 5), 0, p.height),
         2,
         2
       );
     }
+    staticOrbitLayers[pPair] = sLayer;
   }
 
   function drawPlanets() {
@@ -88,6 +124,7 @@ const mainSketch = (p) => {
     for (const planet in frames[frameIndex]) {
       for (const [x, y] of frames[frameIndex][planet]) {
         if (window.sharedData.selectedPlanets.includes(planet)) {
+          // only draw planet if selected
           animationLayer.ellipse(
             p.map(x, -62, 62, 0, p.width),
             p.map(y, -62 / (9 / 5), 62 / (9 / 5), 0, p.height),
@@ -95,9 +132,6 @@ const mainSketch = (p) => {
             8
           );
         }
-
-        //print("X:" + x + " Y:" + y);
-        //print(frameIndex);
       }
     }
 

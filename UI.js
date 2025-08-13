@@ -3,27 +3,6 @@ const sketch = (p) => {
   const radius = 200;
   const pointRadius = 10;
   const labels = ["b", "c", "d", "e", "f", "g"];
-  const ratios = {
-    bc: "3:2",
-    bd: "9:4",
-    be: "27:8",
-    bf: "9:2",
-    bg: "6:1",
-
-    cd: "3:2",
-    ce: "9:4",
-    cf: "3:1",
-    cg: "4:1",
-
-    de: "3:2",
-    df: "2:1",
-    dg: "8:3",
-
-    ef: "4:3",
-    eg: "16:9",
-
-    fg: "4:3",
-  };
   let points = [];
   let hoveredLine = null;
   let hoveredPlanets = ""; //will be a concatenated string of the two planet names, e.g. "be"
@@ -74,10 +53,10 @@ const sketch = (p) => {
         const pt2 = points[j];
         if (hoveredLine && hoveredLine.i === i && hoveredLine.j === j) {
           p.stroke(0, 100, 200);
-          p.strokeWeight(6);
+          p.strokeWeight(7);
         } else {
           p.stroke(150);
-          p.strokeWeight(3);
+          p.strokeWeight(4);
         }
         p.line(pt1.x, pt1.y, pt2.x, pt2.y);
       }
@@ -103,7 +82,7 @@ const sketch = (p) => {
 
       const label1 = labels[hoveredLine.i];
       const label2 = labels[hoveredLine.j];
-      const lineRatio = ratios[label1 + label2];
+      const lineRatio = window.sharedData.ratios[label1 + label2];
       const tooltipText = `${label1}:${label2} = ${lineRatio}`;
 
       // Draw tooltip background
@@ -133,6 +112,7 @@ const sketch = (p) => {
         window.sharedData.selectedPlanets != window.sharedData.allPlanets
       ) {
         window.sharedData.selectedPlanets = window.sharedData.allPlanets;
+        hoveredPlanets = "";
         window.sharedData.updateOrbits = true;
       }
     }
